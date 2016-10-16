@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Obstacle {
 
-    public static final int OBSTACLE_WIDTH = 32;
+    public static final int OBSTACLE_WIDTH = 16;
 
 
     private static final int FLUCTUATION = 150;
@@ -29,7 +29,7 @@ public class Obstacle {
         if(rand.nextInt(10)>3)
             posObs = new Vector2(x , 100);
         else
-            posObs = new Vector2(x , 140);
+            posObs = new Vector2(x , 155);
 
         rec_obs = new Rectangle(posObs.x, posObs.y, obstacle.getWidth(), obstacle.getHeight());
     }
@@ -50,11 +50,15 @@ public class Obstacle {
         if(rand.nextInt(10)>3)
             posObs.set(x + rand.nextInt(60) , 100);
         else
-            posObs.set(x + rand.nextInt(60) , 140);
+            posObs.set(x + rand.nextInt(60) , 155);
 
         rec_obs.setPosition(posObs.x, posObs.y);
     }
     public boolean collides(Rectangle player){
         return player.overlaps(rec_obs);
+    }
+
+    public void dispose(){
+        obstacle.dispose();
     }
 }

@@ -80,7 +80,6 @@ public class PlayState extends State {
         man.update(dt);
         cam.position.x = man.getPosition().x + 200;
 
-    //    System.out.println(cam.viewportWidth);
 
 
         for(Obstacle obs : obstacles){
@@ -89,8 +88,8 @@ public class PlayState extends State {
                     obs.reposition(obs.getPosObs().x + ((Obstacle.OBSTACLE_WIDTH + OBS_SPACING) * 5 ) + Obstacle.OBSTACLE_WIDTH);
             }
             if(obs.collides(man.getBounds()))
-                  pain_hit.play(0.5f);
-           //     gsm.set(new PlayState(gsm));
+            //      pain_hit.play(0.5f);
+                  gsm.set(new MenuState(gsm));
         }
 
         cam.update();
@@ -141,7 +140,6 @@ public class PlayState extends State {
 
     public class MyInputProcessor implements InputProcessor {
 
-     //   public long begintime;
 
         public boolean keyDown (int keycode) {
             return false;
@@ -164,6 +162,7 @@ public class PlayState extends State {
         public boolean touchUp (int x, int y, int pointer, int button) {
             if((System.nanoTime()-begintime)/1000000000.0f < 0.15f
                     && man.getPosition().y == 100 && Gdx.input.getX() > 584){
+                System.out.println("long");
                 man.jump();
 
             }

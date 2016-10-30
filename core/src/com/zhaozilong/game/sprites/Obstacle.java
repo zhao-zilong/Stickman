@@ -1,10 +1,10 @@
 package com.zhaozilong.game.sprites;
 
 import com.badlogic.gdx.graphics.Texture;
-import java.util.Random;
-
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.Random;
 
 /**
  * Created by zhaozilong on 2016/10/15.
@@ -21,6 +21,7 @@ public class Obstacle {
     private Vector2 posObs;
     private Rectangle rec_obs;
     private Random rand;
+    private boolean counted = false;
 
 
     public Obstacle(float x){
@@ -46,19 +47,30 @@ public class Obstacle {
     }
 
     public void reposition(float x){
-       // posObs.set(rand.nextInt(FLUCTUATION) + OBS_GAP , y);
+
         if(rand.nextInt(10)>3)
             posObs.set(x + rand.nextInt(60) , 100);
         else
             posObs.set(x + rand.nextInt(60) , 155);
 
         rec_obs.setPosition(posObs.x, posObs.y);
+        this.counted = false;
     }
+
+
     public boolean collides(Rectangle player){
         return player.overlaps(rec_obs);
     }
 
     public void dispose(){
         obstacle.dispose();
+    }
+
+    public void setCounted(boolean counted) {
+        this.counted = counted;
+    }
+
+    public boolean isCounted() {
+        return counted;
     }
 }

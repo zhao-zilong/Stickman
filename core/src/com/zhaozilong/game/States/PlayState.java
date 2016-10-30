@@ -5,10 +5,15 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Array;
 import com.zhaozilong.game.Stickman;
 import com.zhaozilong.game.sprites.Man;
 import com.zhaozilong.game.sprites.Obstacle;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 
 /**
@@ -25,21 +30,23 @@ public class PlayState extends State {
     private Texture background;
     private Texture ground;
     private Sound pain_hit;
-    //private Obstacle obs;
+    private Socket client;
+    private int score = 0;
+    private int combo = 0;
+    private boolean emit = true;
 
     private Array<Obstacle> obstacles;
     private float begintime = 0;
     private boolean isreleased = true;
 
 
-    public PlayState(GameStateManager gsm) {
+    public PlayState(GameStateManager gsm, Socket client) {
         super(gsm);
-
+        this.client = client;
         man = new Man(50, 100);
         cam.setToOrtho(false, Stickman.WIDTH / 2, Stickman.HEIGHT / 2);
         background = new Texture("background.png");
         ground = new Texture("ground.png");
-   //     obs = new Obstacle(0);
         pain_hit = Gdx.audio.newSound(Gdx.files.internal("pain_hit.ogg"));
 
         obstacles = new Array<Obstacle>();
@@ -52,25 +59,23 @@ public class PlayState extends State {
     @Override
     protected void handleInput(){
         if(Gdx.input.justTouched()) {
-//            if (Gdx.input.getX() > 584 && man.getPosition().y == 100){
-//                while(isreleased == false && (System.nanoTime()-begintime)/1000000000.0f < 0.2){}
-//                if(isreleased == true)
-//                    System.out.println("short");
-//                else
-//                    System.out.println("long");
-////                man.jump();
-//            }
-             if (Gdx.input.getX() <= 584) {
-               try {
-                   man.roll();
-               }
-               catch(InterruptedException e){
-                   System.out.println(e.getMessage());
-               }
+            System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
+            if (Gdx.input.getX() <= 640 && Gdx.input.getY() > 400) {
+                try {
+                    man.roll();
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                }
             }
         }
-
-
+        try {
+            if(client.getInputStream().available() > 0){
+                String message = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
+                Gdx.app.log("socket server: ", "got client message: " + message);
+            }
+        }catch (IOException e) {
+            Gdx.app.log("socket server: ", "an error occured", e);
+        }
 
     }
 
@@ -84,12 +89,31 @@ public class PlayState extends State {
 
         for(Obstacle obs : obstacles){
             if(cam.position.x - (cam.viewportWidth / 2) > obs.getPosObs().x + obs.getObstacle().getWidth()){
-
-                    obs.reposition(obs.getPosObs().x + ((Obstacle.OBSTACLE_WIDTH + OBS_SPACING) * 5 ) + Obstacle.OBSTACLE_WIDTH);
+                obs.reposition(obs.getPosObs().x + ((Obstacle.OBSTACLE_WIDTH + OBS_SPACING) * 5 ) + Obstacle.OBSTACLE_WIDTH);
             }
-            if(obs.collides(man.getBounds()))
-            //      pain_hit.play(0.5f);
-                  gsm.set(new MenuState(gsm));
+            if(obs.collides(man.getBounds())) {
+                pain_hit.play(0.5f);
+                this.combo = 0;
+                this.score--;
+                //gsm.set(new MenuState(gsm));
+            }
+            if(man.getPosition().x > obs.getPosObs().x + obs.getObstacle().getWidth() && obs.isCounted() == false){
+                obs.setCounted(true);
+                this.score++;
+                this.combo++;
+                if(this.combo == 5){ this.combo = 1; emit = true;}
+            }
+
+        }
+        if(this.combo == 4 && emit == true){
+            System.out.println("in combo == 3");
+            try{
+            this.client.getOutputStream().write("using a skill here\n".getBytes());
+
+            } catch (IOException e) {
+              Gdx.app.log("socket server: ", "an error occured", e);
+            }
+            emit = false;
         }
 
         cam.update();
@@ -108,7 +132,7 @@ public class PlayState extends State {
         }
 
         if((System.nanoTime()-begintime)/1000000000.0f >= 0.15f && isreleased == false
-                && man.getPosition().y == 100 &&Gdx.input.getX() > 584){
+                && man.getPosition().y == 100 &&Gdx.input.getX() > 640 && Gdx.input.getY() > 400){
             man.jump();
             man.ResetGRAVITY(-25);
             isreleased = true;
@@ -161,7 +185,7 @@ public class PlayState extends State {
 
         public boolean touchUp (int x, int y, int pointer, int button) {
             if((System.nanoTime()-begintime)/1000000000.0f < 0.15f
-                    && man.getPosition().y == 100 && Gdx.input.getX() > 584){
+                    && man.getPosition().y == 100 && Gdx.input.getX() > 640 && Gdx.input.getY() > 400){
                 System.out.println("long");
                 man.jump();
 

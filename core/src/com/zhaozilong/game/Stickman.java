@@ -19,7 +19,7 @@ public class Stickman extends ApplicationAdapter {
 
 
 
-	private SpriteBatch batch;
+	public static SpriteBatch batch;
 
 	private Music music;
 	
@@ -49,6 +49,7 @@ public class Stickman extends ApplicationAdapter {
 	}
 	
 //	@Override
+
 	public void dispose () {
 		music.dispose();
 	}

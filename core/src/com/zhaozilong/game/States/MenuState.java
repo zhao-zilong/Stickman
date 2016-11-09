@@ -39,6 +39,25 @@ public class MenuState extends State implements TextInputListener{
 
     @Override
     public void handleInput() {
+        // getHeight == 100 means we have replaced 'wait' by 'waiting'
+        if(waitBtn.getHeight() == 100){
+            ServerSocketHints hints = new ServerSocketHints();
+            hints.acceptTimeout = 50000;
+            ServerSocket server = Gdx.net.newServerSocket(Net.Protocol.TCP, 9999, hints);
+            // wait for the next client connection
+            System.out.println("waiting client");
+
+            Socket client = server.accept(null);
+            // read message and send it back
+            try {
+                String message = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
+                Gdx.app.log("socket server: ", "got client message: " + message);
+                client.getOutputStream().write("Hi welcome to server\n".getBytes());
+            } catch (IOException e) {
+                Gdx.app.log("socket server: ", "an error occured", e);
+            }
+            gsm.set(new PlayState(gsm, client));
+        }
         if(Gdx.input.justTouched()){
 
             System.out.println(Gdx.input.getX()+" "+ Gdx.input.getY());
@@ -46,6 +65,7 @@ public class MenuState extends State implements TextInputListener{
                && Gdx.input.getY()<260 && Gdx.input.getY()>110){
                 Gdx.input.getTextInput(this, "Ip address of host", "localhost", "");
                 while(text == "waiting"){
+
                     try{
                         Thread.sleep(500);
                     }
@@ -66,30 +86,12 @@ public class MenuState extends State implements TextInputListener{
                 }
                 gsm.set(new PlayState(gsm, client));
 
-
-
             }
 
             if(Gdx.input.getX()>430 && Gdx.input.getX()<860
                     && Gdx.input.getY()<620 && Gdx.input.getY()>470){
                 System.out.println("wait");
-                ServerSocketHints hints = new ServerSocketHints();
-                hints.acceptTimeout = 50000;
-                ServerSocket server = Gdx.net.newServerSocket(Net.Protocol.TCP, 9999, hints);
-                // wait for the next client connection
-                System.out.println("waiting client");
-
-                Socket client = server.accept(null);
-                // read message and send it back
-                try {
-                    String message = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
-                    Gdx.app.log("socket server: ", "got client message: " + message);
-                    client.getOutputStream().write("Hi welcome to server\n".getBytes());
-                } catch (IOException e) {
-                    Gdx.app.log("socket server: ", "an error occured", e);
-                }
-                gsm.set(new PlayState(gsm, client));
-
+                waitBtn = new Texture("waiting.png");
             }
 
 
@@ -109,7 +111,6 @@ public class MenuState extends State implements TextInputListener{
         sb.draw(background, 0, 0);
         sb.draw(playBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y+50 );
         sb.draw(waitBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y/3 );
-
         sb.end();
     }
 
@@ -117,6 +118,7 @@ public class MenuState extends State implements TextInputListener{
     public void dispose() {
         background.dispose();
         playBtn.dispose();
+        waitBtn.dispose();
         System.out.println("Menu disposed");
     }
 

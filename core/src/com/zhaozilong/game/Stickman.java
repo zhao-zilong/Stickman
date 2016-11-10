@@ -19,7 +19,7 @@ public class Stickman extends ApplicationAdapter {
 
 
 
-	public static SpriteBatch batch;
+	private SpriteBatch batch;
 
 	private Music music;
 	
@@ -30,7 +30,7 @@ public class Stickman extends ApplicationAdapter {
 		music = Gdx.audio.newMusic(Gdx.files.internal("music.ogg"));
 		music.setLooping(true);
 		music.setVolume(0.1f);
-		//music.play();
+		music.play();
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		gsm.push(new MenuState(gsm));
 	}
@@ -49,7 +49,6 @@ public class Stickman extends ApplicationAdapter {
 	}
 	
 //	@Override
-
 	public void dispose () {
 		music.dispose();
 	}

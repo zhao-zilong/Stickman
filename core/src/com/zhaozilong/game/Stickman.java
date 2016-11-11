@@ -7,11 +7,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.zhaozilong.game.States.GameStateManager;
 import com.zhaozilong.game.States.MenuState;
-
 public class Stickman extends ApplicationAdapter {
 
-	public static final int WIDTH = 1280;
-	public static final int HEIGHT = 768;
+	public static  int WIDTH ;
+	public static  int HEIGHT ;
 
 	public static final String TITLE = "Stickman";
 
@@ -25,6 +24,10 @@ public class Stickman extends ApplicationAdapter {
 	
 	@Override
 	public void create () {
+		 WIDTH = Gdx.app.getGraphics().getWidth(); //1280
+		System.out.println("width: "+WIDTH);
+	     HEIGHT = Gdx.app.getGraphics().getHeight(); //768
+		System.out.println("width: "+HEIGHT);
 		batch = new SpriteBatch();
 		gsm = new GameStateManager();
 		music = Gdx.audio.newMusic(Gdx.files.internal("music.ogg"));

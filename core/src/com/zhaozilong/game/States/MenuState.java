@@ -56,13 +56,16 @@ public class MenuState extends State implements TextInputListener{
             } catch (IOException e) {
                 Gdx.app.log("socket server: ", "an error occured", e);
             }
-            gsm.set(new PlayState(gsm, client));
+            //gsm.set(new PlayState(gsm, client));
         }
         if(Gdx.input.justTouched()){
 
-            System.out.println(Gdx.input.getX()+" "+ Gdx.input.getY());
-            if(Gdx.input.getX()>430 && Gdx.input.getX()<860
-               && Gdx.input.getY()<260 && Gdx.input.getY()>110){
+            System.out.println(Gdx.input.getX()/2+" "+ Gdx.input.getY()/2);
+//            System.out.println("play: "+(cam.position.x - waitBtn.getWidth() / 2)+"  "+(cam.position.x + waitBtn.getWidth() / 2)+" "
+//                    +cam.position.y*5/3+" "+(cam.position.y*5/3 - 100));
+//            System.out.println("x: "+cam.position.x+" y:"+cam.position.y);
+            if(Gdx.input.getX()/2>(cam.position.x - playBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + playBtn.getWidth() / 2)
+               && Gdx.input.getY()/2<cam.position.y*2/3 && Gdx.input.getY()/2>(cam.position.y*2/3 - 100)){
                 Gdx.input.getTextInput(this, "Ip address of host", "localhost", "");
                 while(text == "waiting"){
 
@@ -84,16 +87,20 @@ public class MenuState extends State implements TextInputListener{
                 } catch (IOException e) {
                     Gdx.app.log("socket client: ", "an error occured", e);
                 }
-                gsm.set(new PlayState(gsm, client));
+                //gsm.set(new PlayState(gsm, client));
 
             }
 
-            if(Gdx.input.getX()>430 && Gdx.input.getX()<860
-                    && Gdx.input.getY()<620 && Gdx.input.getY()>470){
+            if(Gdx.input.getX()/2>(cam.position.x - waitBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + waitBtn.getWidth() / 2)
+                    && Gdx.input.getY()/2<cam.position.y*5/3 && Gdx.input.getY()/2>(cam.position.y*5/3 -100)){
                 System.out.println("wait");
                 waitBtn = new Texture("waiting.png");
             }
 
+            else{
+
+                gsm.set(new PlayState(gsm));
+            }
 
         }
     }
@@ -109,8 +116,8 @@ public class MenuState extends State implements TextInputListener{
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(background, 0, 0);
-        sb.draw(playBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y+50 );
-        sb.draw(waitBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y/3 );
+        sb.draw(playBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y*4/3 );
+        sb.draw(waitBtn, cam.position.x - waitBtn.getWidth() / 2, cam.position.y/3);
         sb.end();
     }
 

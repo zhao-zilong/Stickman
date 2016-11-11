@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.Date;
-
 /**
  * Created by zhaozilong on 2016/10/15.
  */
@@ -16,7 +14,7 @@ import java.util.Date;
 public class Man {
 
     private static  int GRAVITY = -30;
-    private static final int MOVEMENT = 160;
+    private static final int MOVEMENT = 200;
     private Vector3 position;
     private Vector3 velocity;
     private Rectangle bounds;

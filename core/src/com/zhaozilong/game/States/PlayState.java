@@ -130,6 +130,7 @@ public class PlayState extends State {
                 System.out.println("recover");
                 isAllowedLaunch = true;
             }
+            
             //System.out.println(Gdx.input.getAccelerometerX()+" "+accelY+" "+accelZ);
         }
           //    System.out.println(Gdx.input.getAccelerometerX()+" "+Gdx.input.getAccelerometerY()+" "+Gdx.input.getAccelerometerZ());

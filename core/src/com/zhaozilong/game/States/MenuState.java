@@ -1,31 +1,18 @@
 package com.zhaozilong.game.States;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.TextInputListener;
-import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.net.ServerSocket;
-import com.badlogic.gdx.net.ServerSocketHints;
-import com.badlogic.gdx.net.Socket;
-import com.badlogic.gdx.net.SocketHints;
 import com.zhaozilong.game.Stickman;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Created by zhaozilong on 2016/10/11.
  */
 
-public class MenuState extends State implements TextInputListener{
+public class MenuState extends State{
 
     private Texture background;
     private Texture playBtn;
-    private Texture waitBtn;
-
-    private String text = "waiting";
 
     public MenuState(GameStateManager gsm) {
 
@@ -33,12 +20,12 @@ public class MenuState extends State implements TextInputListener{
         cam.setToOrtho(false, Stickman.WIDTH / 2, Stickman.HEIGHT / 2);
         background = new Texture("background.png");
         playBtn = new Texture("start.png");
-        waitBtn = new Texture("wait.png");
 
     }
 
     @Override
     public void handleInput() {
+<<<<<<< HEAD
         // getHeight == 100 means we have replaced 'wait' by 'waiting'
         if(waitBtn.getHeight() == 100){
             ServerSocketHints hints = new ServerSocketHints();
@@ -102,6 +89,11 @@ public class MenuState extends State implements TextInputListener{
                 gsm.set(new PlayState(gsm));
             }
 
+=======
+        if(Gdx.input.justTouched()){
+            gsm.set(new PlayState(gsm));
+    //        dispose();
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
         }
     }
 
@@ -116,8 +108,12 @@ public class MenuState extends State implements TextInputListener{
         sb.setProjectionMatrix(cam.combined);
         sb.begin();
         sb.draw(background, 0, 0);
+<<<<<<< HEAD
         sb.draw(playBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y*4/3 );
         sb.draw(waitBtn, cam.position.x - waitBtn.getWidth() / 2, cam.position.y/3);
+=======
+        sb.draw(playBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y );
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
         sb.end();
     }
 
@@ -125,19 +121,6 @@ public class MenuState extends State implements TextInputListener{
     public void dispose() {
         background.dispose();
         playBtn.dispose();
-        waitBtn.dispose();
         System.out.println("Menu disposed");
-    }
-
-    @Override
-    public void input(String text) {
-        this.text = text;
-
-
-    }
-
-    @Override
-    public void canceled() {
-        this.text = "Cancelled";
     }
 }

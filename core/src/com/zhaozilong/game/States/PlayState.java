@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Array;
 import com.zhaozilong.game.Stickman;
 import com.zhaozilong.game.sprites.Man;
@@ -27,15 +26,20 @@ public class PlayState extends State {
     private Texture background;
     private Texture ground;
     private Sound pain_hit;
+<<<<<<< HEAD
     private Socket client;
     private int score = 0;
     private int combo = 0;
     private boolean emit = true;
     private float highJumpControl = 0.18f;
+=======
+    //private Obstacle obs;
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
 
     private Array<Obstacle> obstacles;
     private float begintime = 0;
     private boolean isreleased = true;
+<<<<<<< HEAD
     private boolean acceleAvailable;
     private boolean isAllowedLaunch = true;
     private float accelX;
@@ -50,10 +54,18 @@ public class PlayState extends State {
     public PlayState(GameStateManager gsm) {
         super(gsm);
     //    this.client = client;
+=======
+
+
+    public PlayState(GameStateManager gsm) {
+        super(gsm);
+
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
         man = new Man(50, 100);
         cam.setToOrtho(false, Stickman.WIDTH / 2, Stickman.HEIGHT / 2);
         background = new Texture("background.png");
         ground = new Texture("ground.png");
+   //     obs = new Obstacle(0);
         pain_hit = Gdx.audio.newSound(Gdx.files.internal("pain_hit.ogg"));
 
         obstacles = new Array<Obstacle>();
@@ -72,6 +84,7 @@ public class PlayState extends State {
     @Override
     protected void handleInput(){
         if(Gdx.input.justTouched()) {
+<<<<<<< HEAD
             System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
             if (Gdx.input.getX() <= Stickman.WIDTH/2 && Gdx.input.getY() > Stickman.HEIGHT/2) {
                 try {
@@ -131,8 +144,28 @@ public class PlayState extends State {
                 isAllowedLaunch = true;
             }
             //System.out.println(Gdx.input.getAccelerometerX()+" "+accelY+" "+accelZ);
+=======
+//            if (Gdx.input.getX() > 584 && man.getPosition().y == 100){
+//                while(isreleased == false && (System.nanoTime()-begintime)/1000000000.0f < 0.2){}
+//                if(isreleased == true)
+//                    System.out.println("short");
+//                else
+//                    System.out.println("long");
+////                man.jump();
+//            }
+             if (Gdx.input.getX() <= 584) {
+               try {
+                   man.roll();
+               }
+               catch(InterruptedException e){
+                   System.out.println(e.getMessage());
+               }
+            }
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
         }
           //    System.out.println(Gdx.input.getAccelerometerX()+" "+Gdx.input.getAccelerometerY()+" "+Gdx.input.getAccelerometerZ());
+
+
 
     }
 
@@ -146,6 +179,7 @@ public class PlayState extends State {
 
         for(Obstacle obs : obstacles){
             if(cam.position.x - (cam.viewportWidth / 2) > obs.getPosObs().x + obs.getObstacle().getWidth()){
+<<<<<<< HEAD
                 obs.reposition(obs.getPosObs().x + Stickman.WIDTH / 2 + Obstacle.OBSTACLE_WIDTH);
             }
             if(obs.collides(man.getBounds())) {
@@ -172,6 +206,15 @@ public class PlayState extends State {
 //            }
 //            emit = false;
 //        }
+=======
+
+                    obs.reposition(obs.getPosObs().x + ((Obstacle.OBSTACLE_WIDTH + OBS_SPACING) * 5 ) + Obstacle.OBSTACLE_WIDTH);
+            }
+            if(obs.collides(man.getBounds()))
+            //      pain_hit.play(0.5f);
+                  gsm.set(new MenuState(gsm));
+        }
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
 
         cam.update();
     }
@@ -189,7 +232,11 @@ public class PlayState extends State {
         }
 
         if((System.nanoTime()-begintime)/1000000000.0f >= 0.15f && isreleased == false
+<<<<<<< HEAD
                 && man.getPosition().y == 100 &&Gdx.input.getX() > Stickman.WIDTH/2 && Gdx.input.getY() > Stickman.HEIGHT/2){
+=======
+                && man.getPosition().y == 100 &&Gdx.input.getX() > 584){
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
             man.jump();
             man.ResetGRAVITY(-25);
             isreleased = true;
@@ -241,8 +288,13 @@ public class PlayState extends State {
         }
 
         public boolean touchUp (int x, int y, int pointer, int button) {
+<<<<<<< HEAD
             if((System.nanoTime()-begintime)/1000000000.0f < highJumpControl
                     && man.getPosition().y == 100 && Gdx.input.getX() > Stickman.WIDTH/2 && Gdx.input.getY() > Stickman.HEIGHT/2){
+=======
+            if((System.nanoTime()-begintime)/1000000000.0f < 0.15f
+                    && man.getPosition().y == 100 && Gdx.input.getX() > 584){
+>>>>>>> e59db892767182d2cb1d68b93c77f5739acb1ec2
                 System.out.println("long");
                 man.jump();
 

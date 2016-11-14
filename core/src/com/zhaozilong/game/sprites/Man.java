@@ -36,7 +36,7 @@ public class Man {
 
         texture = new Texture("runanimation.png");
         manAnimation = new Animation(new TextureRegion(texture), 9, 0.3f);
-        bounds = new Rectangle(x, y ,texture.getWidth() / 12, texture.getHeight());
+        bounds = new Rectangle(x, y ,texture.getWidth() / 18, texture.getHeight());
         jumpsound = Gdx.audio.newSound(Gdx.files.internal("jump_sound.ogg"));
     }
 

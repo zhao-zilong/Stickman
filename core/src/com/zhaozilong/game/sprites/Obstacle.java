@@ -54,6 +54,7 @@ public class Obstacle {
             posObs.set(x + rand.nextInt(60) , 155);
 
         rec_obs.setPosition(posObs.x, posObs.y);
+        //reset the counted
         this.counted = false;
     }
 

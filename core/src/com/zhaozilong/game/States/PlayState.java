@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.utils.Array;
@@ -21,17 +22,24 @@ public class PlayState extends State {
 
     public static final int OBS_SPACING = 150;
     private static final int OBS_COUNT = 6;
+    private static final int FROZENTIME = 1;
 
 
     private Man man;
     private Texture background;
     private Texture ground;
+    private Texture slots;
     private Sound pain_hit;
     private Socket client;
-    private int score = 0;
     private int combo = 0;
     private boolean emit = true;
     private float highJumpControl = 0.18f;
+
+
+
+    private int score;
+    private String scorePoster;
+    BitmapFont scoreBitmapFont;
 
     private Array<Obstacle> obstacles;
     private float begintime = 0;
@@ -44,6 +52,7 @@ public class PlayState extends State {
     private float initAccelX;
     private float initAccelY;
     private float initAccelZ;
+    private float timeFrozen;
 
 
     //public PlayState(GameStateManager gsm, Socket client) {
@@ -54,6 +63,7 @@ public class PlayState extends State {
         cam.setToOrtho(false, Stickman.WIDTH / 2, Stickman.HEIGHT / 2);
         background = new Texture("background.png");
         ground = new Texture("ground.png");
+        slots = new Texture("slots.png");
         pain_hit = Gdx.audio.newSound(Gdx.files.internal("pain_hit.ogg"));
 
         obstacles = new Array<Obstacle>();
@@ -67,6 +77,10 @@ public class PlayState extends State {
             initAccelY = Gdx.input.getAccelerometerY();
             initAccelZ = Gdx.input.getAccelerometerZ();
         }
+        score = 0;
+        scorePoster = "score: 0";
+        scoreBitmapFont = new BitmapFont();
+
     }
 
     @Override
@@ -99,13 +113,15 @@ public class PlayState extends State {
 
             float ecartX = initAccelX - accelX;
 
-            if(ecartX > 2 && isAllowedLaunch == true){
+            if(ecartX > 3 && isAllowedLaunch == true){
                 System.out.println("pouvoir3");
+                timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
             accelZ = Gdx.input.getAccelerometerZ();
-            if(ecartX < -2 && isAllowedLaunch == true){
+            if(ecartX < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir4");
+                timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
 
@@ -113,19 +129,21 @@ public class PlayState extends State {
 
             float ecartY = initAccelY - accelY;
 
-            if(ecartY > 2 && isAllowedLaunch == true){
+            if(ecartY > 3 && isAllowedLaunch == true){
                 System.out.println("pouvoir1");
+                timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
             accelY = Gdx.input.getAccelerometerY();
-            if(ecartY < -2 && isAllowedLaunch == true){
+            if(ecartY < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir2");
+                timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
 
 
-            if(isAllowedLaunch == false && ecartY < 1 && ecartY > -1
-                    && ecartX < 1 && ecartX > -1)
+            if(isAllowedLaunch == false && ecartY < 2 && ecartY > -2
+                    && ecartX < 2 && ecartX > -2 && (System.nanoTime()-timeFrozen)/1000000000.0f > FROZENTIME)
             {
                 System.out.println("recover");
                 isAllowedLaunch = true;
@@ -149,30 +167,36 @@ public class PlayState extends State {
             if(cam.position.x - (cam.viewportWidth / 2) > obs.getPosObs().x + obs.getObstacle().getWidth()){
                 obs.reposition(obs.getPosObs().x + Stickman.WIDTH / 2 + Obstacle.OBSTACLE_WIDTH);
             }
-            if(obs.collides(man.getBounds())) {
+            if(obs.collides(man.getBounds()) && obs.isCounted() == false) {
                 //pain_hit.play(0.5f);
+                obs.setCounted(true);
                 this.combo = 0;
                 this.score--;
+                //System.out.println(score);
+                scorePoster = "score: "+score;
+
                 //gsm.set(new MenuState(gsm));
             }
+            //must test if the obstacle  has already counted, because update(float dt) is always refreshed.
             if(man.getPosition().x > obs.getPosObs().x + obs.getObstacle().getWidth() && obs.isCounted() == false){
                 obs.setCounted(true);
                 this.score++;
+                scorePoster = "score: "+score;
                 this.combo++;
                 if(this.combo == OBS_COUNT){ this.combo = 1; emit = true;}
             }
 
         }
-//        if(this.combo == OBS_COUNT-1 && emit == true){
-//            System.out.println("in combo == 3");
+        if(this.combo == OBS_COUNT-1 && emit == true){
+            System.out.println("in combo == 5");
 //            try{
 //            this.client.getOutputStream().write("using a skill here\n".getBytes());
 //
 //            } catch (IOException e) {
 //              Gdx.app.log("socket server: ", "an error occured", e);
 //            }
-//            emit = false;
-//        }
+            emit = false;
+        }
 
         cam.update();
     }
@@ -200,10 +224,15 @@ public class PlayState extends State {
         sb.draw(background, cam.position.x - (cam.viewportWidth / 2), 0);
         sb.draw(ground, cam.position.x - (cam.viewportWidth / 2), 84);
         sb.draw(man.getTexture(), man.getPosition().x, man.getPosition().y);
+        sb.draw(slots, cam.position.x - slots.getWidth() / 4, cam.position.y*4/3);
         for(Obstacle obs : obstacles){
             sb.draw(obs.getObstacle(), obs.getPosObs().x, obs.getPosObs().y);
 
         }
+        scoreBitmapFont.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+        scoreBitmapFont.getData().setScale(2f);
+        scoreBitmapFont.draw(sb, scorePoster, cam.position.x - Stickman.WIDTH/4 + 20, cam.position.y*2 - 20);
+
 
         sb.end();
 

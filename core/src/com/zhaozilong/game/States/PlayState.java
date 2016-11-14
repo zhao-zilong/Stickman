@@ -13,6 +13,8 @@ import com.zhaozilong.game.Stickman;
 import com.zhaozilong.game.sprites.Man;
 import com.zhaozilong.game.sprites.Obstacle;
 
+import java.util.Random;
+
 
 /**
  * Created by zhaozilong on 2016/10/13.
@@ -29,11 +31,15 @@ public class PlayState extends State {
     private Texture background;
     private Texture ground;
     private Texture slots;
+    private Texture magic;
+
+
     private Sound pain_hit;
     private Socket client;
     private int combo = 0;
     private boolean emit = true;
     private float highJumpControl = 0.18f;
+    public Random rand = new Random();
 
 
 
@@ -42,6 +48,7 @@ public class PlayState extends State {
     BitmapFont scoreBitmapFont;
 
     private Array<Obstacle> obstacles;
+    private Array<Integer> magics;
     private float begintime = 0;
     private boolean isreleased = true;
     private boolean acceleAvailable;
@@ -55,15 +62,21 @@ public class PlayState extends State {
     private float timeFrozen;
 
 
+
     //public PlayState(GameStateManager gsm, Socket client) {
     public PlayState(GameStateManager gsm) {
         super(gsm);
     //    this.client = client;
+
+        magics = new Array<Integer>();
+
         man = new Man(50, 100);
         cam.setToOrtho(false, Stickman.WIDTH / 2, Stickman.HEIGHT / 2);
         background = new Texture("background.png");
         ground = new Texture("ground.png");
         slots = new Texture("slots.png");
+        magic = new Texture("magic.png");
+
         pain_hit = Gdx.audio.newSound(Gdx.files.internal("pain_hit.ogg"));
 
         obstacles = new Array<Obstacle>();
@@ -115,12 +128,18 @@ public class PlayState extends State {
 
             if(ecartX > 3 && isAllowedLaunch == true){
                 System.out.println("pouvoir3");
+                if(magics.size > 2){
+                    magics.removeIndex(2);
+                }
                 timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
             accelZ = Gdx.input.getAccelerometerZ();
             if(ecartX < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir4");
+                if(magics.size > 3){
+                    magics.removeIndex(3);
+                }
                 timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
@@ -131,12 +150,18 @@ public class PlayState extends State {
 
             if(ecartY > 3 && isAllowedLaunch == true){
                 System.out.println("pouvoir1");
+                if(magics.size > 0){
+                    magics.removeIndex(0);
+                }
                 timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
             accelY = Gdx.input.getAccelerometerY();
             if(ecartY < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir2");
+                if(magics.size > 1){
+                    magics.removeIndex(1);
+                }
                 timeFrozen = System.nanoTime();
                 isAllowedLaunch = false;
             }
@@ -189,6 +214,10 @@ public class PlayState extends State {
         }
         if(this.combo == OBS_COUNT-1 && emit == true){
             System.out.println("in combo == 5");
+            int magicNumber = rand.nextInt(6);
+            System.out.println(magicNumber);
+            if(magics.size < 8)
+                magics.add(magicNumber);
 //            try{
 //            this.client.getOutputStream().write("using a skill here\n".getBytes());
 //
@@ -228,6 +257,9 @@ public class PlayState extends State {
         for(Obstacle obs : obstacles){
             sb.draw(obs.getObstacle(), obs.getPosObs().x, obs.getPosObs().y);
 
+        }
+        for(int i = 0; i < magics.size; i++){
+            sb.draw(magic, i*82 + cam.position.x - (slots.getWidth() / 4) + 1, cam.position.y*4/3 + 1);
         }
         scoreBitmapFont.setColor(0.0f, 0.0f, 0.0f, 1.0f);
         scoreBitmapFont.getData().setScale(2f);

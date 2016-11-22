@@ -14,9 +14,6 @@ import com.zhaozilong.game.Stickman;
 import com.zhaozilong.game.sprites.Man;
 import com.zhaozilong.game.sprites.Obstacle;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Random;
 
 
@@ -24,7 +21,7 @@ import java.util.Random;
  * Created by zhaozilong on 2016/10/13.
  */
 
-public class PlayState extends State {
+public class PracticeState extends State {
 
     public static final int OBS_SPACING = 150;
     private static final int OBS_COUNT = 6;
@@ -70,9 +67,9 @@ public class PlayState extends State {
 
 
 
-    public PlayState(GameStateManager gsm, Socket client) {
+
+    public PracticeState(GameStateManager gsm) {
         super(gsm);
-        this.client = client;
 
         magics = new Array<Integer>();
 
@@ -113,20 +110,6 @@ public class PlayState extends State {
                 }
             }
         }
-        try {
-            if(client.getInputStream().available() > 0){
-                //String message = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
-                int pnumber = new BufferedReader(new InputStreamReader(client.getInputStream())).read();
-                launchPouvoir(pnumber);
-                Gdx.app.log("socket server: ", "got client message: " + pnumber);
-
-
-            }
-        }catch (IOException e) {
-            Gdx.app.log("socket server: ", "an error occured", e);
-        }
-
-
 
         if(acceleAvailable){
 
@@ -139,12 +122,7 @@ public class PlayState extends State {
                 System.out.println("pouvoir3");
 
                 if(magics.size > 2){
-                    try{
-                        this.client.getOutputStream().write(magics.get(2));
-
-                     } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
-                     }
+                    launchPouvoir(magics.get(2));
                     magics.removeIndex(2);
                 }
                 timeFrozen = System.nanoTime();
@@ -154,12 +132,7 @@ public class PlayState extends State {
             if(ecartX < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir4");
                 if(magics.size > 3){
-                    try{
-                        this.client.getOutputStream().write(magics.get(3));
-
-                    } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
-                    }
+                    launchPouvoir(magics.get(3));
                     magics.removeIndex(3);
                 }
                 timeFrozen = System.nanoTime();
@@ -173,12 +146,7 @@ public class PlayState extends State {
             if(ecartY > 3 && isAllowedLaunch == true){
                 System.out.println("pouvoir1");
                 if(magics.size > 0){
-                    try{
-                        this.client.getOutputStream().write(magics.get(0));
-
-                    } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
-                    }
+                    launchPouvoir(magics.get(0));
                     magics.removeIndex(0);
                 }
                 timeFrozen = System.nanoTime();
@@ -188,12 +156,7 @@ public class PlayState extends State {
             if(ecartY < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir2");
                 if(magics.size > 1){
-                    try{
-                        this.client.getOutputStream().write(magics.get(1));
-
-                    } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
-                    }
+                    launchPouvoir(magics.get(1));
                     magics.removeIndex(1);
                 }
                 timeFrozen = System.nanoTime();
@@ -207,10 +170,7 @@ public class PlayState extends State {
                 System.out.println("recover");
                 isAllowedLaunch = true;
             }
-            
-            //System.out.println(Gdx.input.getAccelerometerX()+" "+accelY+" "+accelZ);
-        }
-          //    System.out.println(Gdx.input.getAccelerometerX()+" "+Gdx.input.getAccelerometerY()+" "+Gdx.input.getAccelerometerZ());
+       }
 
     }
 
@@ -236,7 +196,7 @@ public class PlayState extends State {
                 //System.out.println(score);
                 scorePoster = "score: "+score;
 
-
+                //gsm.set(new MenuState(gsm));
             }
             //must test if the obstacle  has already counted, because update(float dt) is always refreshed.
             if(man.getPosition().x > obs.getPosObs().x + obs.getObstacle().getWidth() && obs.isCounted() == false){
@@ -302,8 +262,8 @@ public class PlayState extends State {
 
         }
         for(int i = 0; i < magics.size; i++){
-                magicRegion = new TextureRegion(magic, magics.get(i)*80+1, 0, 80, 80);
-                sb.draw(magicRegion, i * 82 + cam.position.x - (slots.getWidth() / 4) + 1, cam.position.y * 4 / 3 + 1);
+            magicRegion = new TextureRegion(magic, magics.get(i)*80+1, 0, 80, 80);
+            sb.draw(magicRegion, i * 82 + cam.position.x - (slots.getWidth() / 4) + 1, cam.position.y * 4 / 3 + 1);
         }
         scoreBitmapFont.setColor(0.0f, 0.0f, 0.0f, 1.0f);
         scoreBitmapFont.getData().setScale(2f);
@@ -325,6 +285,7 @@ public class PlayState extends State {
         System.out.print("play state disposed");
     }
 
+
     public void launchPouvoir(int pouvoirNumver){
         if(pouvoirNumver == 0){
             man.accelerate();
@@ -336,6 +297,8 @@ public class PlayState extends State {
         }
 
     }
+
+
 
 
     public class MyInputProcessor implements InputProcessor {
@@ -382,4 +345,4 @@ public class PlayState extends State {
             return false;
         }
     }
-    }
+}

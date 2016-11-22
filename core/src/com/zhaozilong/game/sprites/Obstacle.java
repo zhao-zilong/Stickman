@@ -15,8 +15,6 @@ public class Obstacle {
     public static final int OBSTACLE_WIDTH = 16;
 
 
-    private static final int FLUCTUATION = 150;
-    private static final int OBS_GAP = 100;
     private Texture obstacle;
     private Vector2 posObs;
     private Rectangle rec_obs;

@@ -30,7 +30,7 @@ public class Stickman extends ApplicationAdapter {
 		System.out.println("width: "+HEIGHT);
 		batch = new SpriteBatch();
 		gsm = new GameStateManager();
-		music = Gdx.audio.newMusic(Gdx.files.internal("music.ogg"));
+		music = Gdx.audio.newMusic(Gdx.files.internal("music/music.ogg"));
 		music.setLooping(true);
 		music.setVolume(0.1f);
 		//music.play();

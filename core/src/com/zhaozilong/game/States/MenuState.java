@@ -24,6 +24,7 @@ public class MenuState extends State implements TextInputListener{
     private Texture background;
     private Texture playBtn;
     private Texture waitBtn;
+    private Texture practiceBtn;
 
     private String text = "waiting";
 
@@ -32,8 +33,9 @@ public class MenuState extends State implements TextInputListener{
         super(gsm);
         cam.setToOrtho(false, Stickman.WIDTH / 2, Stickman.HEIGHT / 2);
         background = new Texture("background.png");
-        playBtn = new Texture("start.png");
-        waitBtn = new Texture("wait.png");
+        playBtn = new Texture("menu/start.png");
+        waitBtn = new Texture("menu/wait.png");
+        practiceBtn = new Texture("menu/practice.png");
 
     }
 
@@ -94,13 +96,20 @@ public class MenuState extends State implements TextInputListener{
             if(Gdx.input.getX()/2>(cam.position.x - waitBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + waitBtn.getWidth() / 2)
                     && Gdx.input.getY()/2<cam.position.y*5/3 && Gdx.input.getY()/2>(cam.position.y*5/3 -100)){
                 System.out.println("wait");
-                waitBtn = new Texture("waiting.png");
+                waitBtn = new Texture("menu/waiting.png");
             }
 
-            else{
+            if(Gdx.input.getX()/2>(cam.position.x - practiceBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + practiceBtn.getWidth() / 2)
+                    && Gdx.input.getY()/2<cam.position.y*6/5 && Gdx.input.getY()/2>(cam.position.y*6/5 -100)){
+                System.out.println("practice");
+                gsm.set(new PracticeState(gsm));
 
-                gsm.set(new PlayState(gsm));
             }
+
+//            else{
+//
+//                gsm.set(new PlayState(gsm));
+//            }
 
         }
     }
@@ -118,6 +127,7 @@ public class MenuState extends State implements TextInputListener{
         sb.draw(background, 0, 0);
         sb.draw(playBtn, cam.position.x - playBtn.getWidth() / 2, cam.position.y*4/3 );
         sb.draw(waitBtn, cam.position.x - waitBtn.getWidth() / 2, cam.position.y/3);
+        sb.draw(practiceBtn, cam.position.x - waitBtn.getWidth() / 2, cam.position.y*4/5);
         sb.end();
     }
 

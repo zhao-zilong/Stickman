@@ -253,7 +253,7 @@ public class PlayState extends State {
             int magicNumber = rand.nextInt(2);
             System.out.println(magicNumber);
             if(magics.size < 7)
-                magics.add(0);
+                magics.add(magicNumber);
             emit = false;
         }
 
@@ -326,6 +326,7 @@ public class PlayState extends State {
     }
 
     public void launchPouvoir(int pouvoirNumver){
+        Gdx.input.vibrate(2000);
         if(pouvoirNumver == 0){
             man.accelerate();
             return;

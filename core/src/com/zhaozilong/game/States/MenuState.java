@@ -19,14 +19,16 @@ import java.io.InputStreamReader;
  * Created by zhaozilong on 2016/10/11.
  */
 
-public class MenuState extends State implements TextInputListener{
+public class MenuState extends State {
 
     private Texture background;
     private Texture playBtn;
     private Texture waitBtn;
     private Texture practiceBtn;
 
-    private String text = "waiting";
+    public String text = "waiting";
+
+    public boolean isInputTreating = false;
 
     public MenuState(GameStateManager gsm) {
 
@@ -45,7 +47,7 @@ public class MenuState extends State implements TextInputListener{
         if(waitBtn.getHeight() == 100){
             ServerSocketHints hints = new ServerSocketHints();
             hints.acceptTimeout = 50000;
-            ServerSocket server = Gdx.net.newServerSocket(Net.Protocol.TCP, 9999, hints);
+            ServerSocket server = Gdx.net.newServerSocket(Net.Protocol.TCP, 11111, hints);
             // wait for the next client connection
             System.out.println("waiting client");
 
@@ -58,30 +60,27 @@ public class MenuState extends State implements TextInputListener{
             } catch (IOException e) {
                 Gdx.app.log("socket server: ", "an error occured", e);
             }
-            //gsm.set(new PlayState(gsm, client));
+            gsm.set(new PlayState(gsm, client));
         }
-        if(Gdx.input.justTouched()){
+        if(text != "waiting" || Gdx.input.justTouched()){
 
             System.out.println(Gdx.input.getX()/2+" "+ Gdx.input.getY()/2);
 //            System.out.println("play: "+(cam.position.x - waitBtn.getWidth() / 2)+"  "+(cam.position.x + waitBtn.getWidth() / 2)+" "
 //                    +cam.position.y*5/3+" "+(cam.position.y*5/3 - 100));
 //            System.out.println("x: "+cam.position.x+" y:"+cam.position.y);
-            if(Gdx.input.getX()/2>(cam.position.x - playBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + playBtn.getWidth() / 2)
+            if(text != "waiting" || Gdx.input.getX()/2>(cam.position.x - playBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + playBtn.getWidth() / 2)
                && Gdx.input.getY()/2<cam.position.y*2/3 && Gdx.input.getY()/2>(cam.position.y*2/3 - 100)){
-                Gdx.input.getTextInput(this, "Ip address of host", "localhost", "");
-                while(text == "waiting"){
 
-                    try{
-                        Thread.sleep(500);
-                    }
-                    catch(InterruptedException e) {
-                        System.out.println(e.getMessage());
-                    }
-
+                if(!isInputTreating) {
+                    Gdx.input.getTextInput(new MyTextInputListener(), "Ip address of host", "localhost", "");
                 }
-                System.out.println("before create socket");
+                isInputTreating = true;
+                if(text == "waiting"){
+                    return;
+                }
+                System.out.println("before create socket final");
                 SocketHints hints = new SocketHints();
-                Socket client = Gdx.net.newClientSocket(Net.Protocol.TCP, this.text, 9999, hints);
+                Socket client = Gdx.net.newClientSocket(Net.Protocol.TCP, this.text, 11111, hints);
                 try {
                     client.getOutputStream().write("hello server, i am client\n".getBytes());
                     String response = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
@@ -89,7 +88,7 @@ public class MenuState extends State implements TextInputListener{
                 } catch (IOException e) {
                     Gdx.app.log("socket client: ", "an error occured", e);
                 }
-                //gsm.set(new PlayState(gsm, client));
+                gsm.set(new PlayState(gsm, client));
 
             }
 
@@ -106,10 +105,6 @@ public class MenuState extends State implements TextInputListener{
 
             }
 
-//            else{
-//
-//                gsm.set(new PlayState(gsm));
-//            }
 
         }
     }
@@ -139,15 +134,18 @@ public class MenuState extends State implements TextInputListener{
         System.out.println("Menu disposed");
     }
 
-    @Override
-    public void input(String text) {
-        this.text = text;
 
+    public class MyTextInputListener implements TextInputListener {
+        @Override
+        public void input (String txt) {
+            text = txt;
+            System.out.println("in input");
+        }
 
-    }
-
-    @Override
-    public void canceled() {
-        this.text = "Cancelled";
+        @Override
+        public void canceled () {
+        }
     }
 }
+
+

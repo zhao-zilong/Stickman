@@ -13,6 +13,8 @@ import java.util.Random;
 public class Obstacle {
 
     public static final int OBSTACLE_WIDTH = 16;
+    //actually the total number is TOTALOBS plus the initial obtacles
+    public static final int TOTALOBS = 54;
 
 
     private Texture obstacle;
@@ -20,6 +22,7 @@ public class Obstacle {
     private Rectangle rec_obs;
     private Random rand;
     private boolean counted = false;
+    private static int counter = 0;
 
 
     public Obstacle(float x){
@@ -46,15 +49,38 @@ public class Obstacle {
 
     public void reposition(float x){
 
-        if(rand.nextInt(10)>3)
-            posObs.set(x + rand.nextInt(60) , 100);
+        if(getcounter() <= TOTALOBS) {
+            if (rand.nextInt(10) > 3)
+                posObs.set(x + rand.nextInt(60), 100);
+            else
+                posObs.set(x + rand.nextInt(60), 155);
+
+            rec_obs.setPosition(posObs.x, posObs.y);
+            //reset the counted
+            this.counted = false;
+            this.counter++;
+            System.out.println("counter: "+this.counter);
+        }
+        else{
+            posObs.set(x, 84);
+            rec_obs.setPosition(posObs.x, posObs.y);
+        }
+
+
+
+        //System.out.println("outside reposition");
+    }
+    public void repositionPractice(float x) {
+        if (rand.nextInt(10) > 3)
+            posObs.set(x + rand.nextInt(60), 100);
         else
-            posObs.set(x + rand.nextInt(60) , 155);
+            posObs.set(x + rand.nextInt(60), 155);
 
         rec_obs.setPosition(posObs.x, posObs.y);
         //reset the counted
         this.counted = false;
     }
+
 
 
     public boolean collides(Rectangle player){
@@ -72,4 +98,6 @@ public class Obstacle {
     public boolean isCounted() {
         return counted;
     }
+
+    public static int getcounter() { return counter; }
 }

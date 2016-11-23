@@ -184,7 +184,7 @@ public class PracticeState extends State {
 
         for(Obstacle obs : obstacles){
             if(cam.position.x - (cam.viewportWidth / 2) > obs.getPosObs().x + obs.getObstacle().getWidth()){
-                obs.reposition(obs.getPosObs().x + Stickman.WIDTH / 2 + Obstacle.OBSTACLE_WIDTH);
+                obs.repositionPractice(obs.getPosObs().x + Stickman.WIDTH / 2 + Obstacle.OBSTACLE_WIDTH);
             }
             if(obs.collides(man.getBounds()) && obs.isCounted() == false ) {
                 //pain_hit.play(0.5f);

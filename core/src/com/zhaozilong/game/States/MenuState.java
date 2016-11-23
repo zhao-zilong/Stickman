@@ -10,6 +10,7 @@ import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.net.SocketHints;
 import com.zhaozilong.game.Stickman;
+import com.zhaozilong.game.sprites.Obstacle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,6 +61,7 @@ public class MenuState extends State {
             } catch (IOException e) {
                 Gdx.app.log("socket server: ", "an error occured", e);
             }
+            System.out.println("create new playstate: "+System.nanoTime()/1000000000.0f);
             gsm.set(new PlayState(gsm, client));
         }
         if(text != "waiting" || Gdx.input.justTouched()){
@@ -73,8 +75,8 @@ public class MenuState extends State {
 
                 if(!isInputTreating) {
                     Gdx.input.getTextInput(new MyTextInputListener(), "Ip address of host", "localhost", "");
+                    isInputTreating = true;
                 }
-                isInputTreating = true;
                 if(text == "waiting"){
                     return;
                 }
@@ -100,13 +102,15 @@ public class MenuState extends State {
 
             if(Gdx.input.getX()/2>(cam.position.x - practiceBtn.getWidth() / 2) && Gdx.input.getX()/2<(cam.position.x + practiceBtn.getWidth() / 2)
                     && Gdx.input.getY()/2<cam.position.y*6/5 && Gdx.input.getY()/2>(cam.position.y*6/5 -100)){
-                System.out.println("practice");
-                gsm.set(new PracticeState(gsm));
+                if(text == "waiting" && !isInputTreating) {
+                    System.out.println("practice");
+                    gsm.set(new PracticeState(gsm));
+                }
 
             }
 
-
         }
+
     }
 
     @Override

@@ -31,8 +31,10 @@ public class PlayState extends State {
     private static final int FROZENTIME = 1;
     private static final int TRANSPARENTEFFECT = 5;
     private static final int ACCELERATEEFFECT = 10;
+    private static final int TOTALMAGIC = 7;
 
     private static final int TOTALOBSTACLE = Obstacle.TOTALOBS+OBS_COUNT;
+    private int accumelatedObs = 0;
 
 
 
@@ -130,16 +132,15 @@ public class PlayState extends State {
                 //String message = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
                 int pnumber = new BufferedReader(new InputStreamReader(client.getInputStream())).read();
                 System.out.println("pnumber received: "+pnumber);
-                if(pnumber <= 100 && pnumber >= -100) {
+                if(pnumber >= TOTALMAGIC) {
                     System.out.println("we are here in the end: "+pnumber);
-                    this.score_enemy = pnumber-TOTALOBSTACLE;
+                    this.score_enemy = pnumber-TOTALOBSTACLE-TOTALMAGIC;
+                    System.out.println("score_enemy: "+this.score_enemy);
                     //this.client.getOutputStream().write(score+200);
                     //gsm.set(new ResultState(gsm, score, pnumber - 200));
                 }
                 else{
-                    if(pnumber >=-127 && pnumber <=-121) {
                         launchPouvoir(pnumber);
-                    }
                 }
                 Gdx.app.log("socket server: ", "got client message: " + pnumber);
 
@@ -150,7 +151,7 @@ public class PlayState extends State {
         }
 
 
-        if(isfinished && score_enemy!= -101){
+        if(isfinished && score_enemy!= -101 && accumelatedObs == TOTALOBSTACLE){
             gsm.set(new ResultState(gsm, score, score_enemy));
         }
 
@@ -175,12 +176,17 @@ public class PlayState extends State {
                 System.out.println("pouvoir3");
 
                 if(magics.size > 2){
-                    try{
-                        this.client.getOutputStream().write(magics.get(2));
+                    if(magics.get(2) == 1){
+                        launchPouvoir(1);
+                    }
+                    else {
+                        try {
+                            this.client.getOutputStream().write(magics.get(2));
 
-                     } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
-                     }
+                        } catch (IOException e) {
+                            Gdx.app.log("socket server: ", "an error occured", e);
+                        }
+                    }
                     magics.removeIndex(2);
                 }
                 timeFrozen = System.nanoTime();
@@ -190,11 +196,16 @@ public class PlayState extends State {
             if(ecartX < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir4");
                 if(magics.size > 3){
-                    try{
-                        this.client.getOutputStream().write(magics.get(3));
+                    if(magics.get(3) == 1){
+                        launchPouvoir(1);
+                    }
+                    else {
+                        try {
+                            this.client.getOutputStream().write(magics.get(3));
 
-                    } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
+                        } catch (IOException e) {
+                            Gdx.app.log("socket server: ", "an error occured", e);
+                        }
                     }
                     magics.removeIndex(3);
                 }
@@ -209,11 +220,16 @@ public class PlayState extends State {
             if(ecartY > 3 && isAllowedLaunch == true){
                 System.out.println("pouvoir1");
                 if(magics.size > 0){
-                    try{
-                        this.client.getOutputStream().write(magics.get(0));
+                    if(magics.get(0) == 1){
+                        launchPouvoir(1);
+                    }
+                    else {
+                        try {
+                            this.client.getOutputStream().write(magics.get(0));
 
-                    } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
+                        } catch (IOException e) {
+                            Gdx.app.log("socket server: ", "an error occured", e);
+                        }
                     }
                     magics.removeIndex(0);
                 }
@@ -224,11 +240,16 @@ public class PlayState extends State {
             if(ecartY < -3 && isAllowedLaunch == true){
                 System.out.println("pouvoir2");
                 if(magics.size > 1){
-                    try{
-                        this.client.getOutputStream().write(magics.get(1));
+                    if(magics.get(1) == 1){
+                        launchPouvoir(1);
+                    }
+                    else {
+                        try {
+                            this.client.getOutputStream().write(magics.get(1));
 
-                    } catch (IOException e){
-                        Gdx.app.log("socket server: ", "an error occured", e);
+                        } catch (IOException e) {
+                            Gdx.app.log("socket server: ", "an error occured", e);
+                        }
                     }
                     magics.removeIndex(1);
                 }
@@ -260,10 +281,10 @@ public class PlayState extends State {
 
         cam.position.x = man.getPosition().x + 200;
 
-        if(Obstacle.getcounter() == Obstacle.TOTALOBS && !isfinished){
+        if(Obstacle.getcounter() == Obstacle.TOTALOBS && !isfinished && accumelatedObs == TOTALOBSTACLE){
             try{
                 System.out.println(score);
-                this.client.getOutputStream().write(score+TOTALOBSTACLE);
+                this.client.getOutputStream().write(score+TOTALOBSTACLE+TOTALMAGIC);
                 System.out.println("finishhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
                 isfinished = true;
 
@@ -288,19 +309,22 @@ public class PlayState extends State {
                 if(!man.getIsTran()) {
                     this.score--;
                 }
-                //System.out.println(score);
+                this.accumelatedObs++;
+                System.out.println("--passed: "+accumelatedObs);
                 scorePoster = "score: "+score;
-
 
             }
             //must test if the obstacle  has already counted, because update(float dt) is always refreshed.
             if(man.getPosition().x > obs.getPosObs().x + obs.getObstacle().getWidth() && obs.isCounted() == false){
                 obs.setCounted(true);
                 this.score++;
+                this.accumelatedObs++;
+                System.out.println("++passed: "+accumelatedObs);
                 scorePoster = "score: "+score;
                 this.combo++;
                 if(this.combo == OBS_COUNT){ this.combo = 1; emit = true;}
             }
+
 
         }
         if(this.combo == OBS_COUNT-1 && emit == true){

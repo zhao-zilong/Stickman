@@ -28,12 +28,14 @@ public class PracticeState extends State {
     private static final int FROZENTIME = 1;
     private static final int TRANSPARENTEFFECT = 5;
     private static final int ACCELERATEEFFECT = 10;
+    private static final int MINIEFFECT = 10;
 
 
     private Man man;
     private Texture background;
     private Texture ground;
     private Texture slots;
+    private Texture back;
     private Texture magic = new Texture("magic/magic.png");
     private TextureRegion magicRegion;
 
@@ -78,6 +80,7 @@ public class PracticeState extends State {
         background = new Texture("background.png");
         ground = new Texture("ground.png");
         slots = new Texture("slots.png");
+        back = new Texture("back.png");
 
         pain_hit = Gdx.audio.newSound(Gdx.files.internal("music/pain_hit.ogg"));
 
@@ -108,6 +111,10 @@ public class PracticeState extends State {
                 } catch (InterruptedException e) {
                     System.out.println(e.getMessage());
                 }
+            }
+            if (Gdx.input.getX() >= Stickman.WIDTH/2 - 200
+                    && Gdx.input.getY() <= 80){
+                    gsm.set(new MenuState(gsm));
             }
         }
 
@@ -210,7 +217,7 @@ public class PracticeState extends State {
         }
         if(this.combo == OBS_COUNT-1 && emit == true){
             System.out.println("in combo == 5");
-            int magicNumber = rand.nextInt(2);
+            int magicNumber = rand.nextInt(3);
             System.out.println(magicNumber);
             if(magics.size < 7)
                 magics.add(magicNumber);
@@ -245,6 +252,13 @@ public class PracticeState extends State {
             }
         }
 
+        if(man.getIsMini()){
+            elapsedTime = (System.nanoTime()-man.getMiniBeginTime())/1000000000.0f;
+            if(elapsedTime > MINIEFFECT){
+                man.terminateMiniature();
+            }
+        }
+
         if((System.nanoTime()-begintime)/1000000000.0f >= 0.15f && isreleased == false
                 && man.getPosition().y == 100 &&Gdx.input.getX() > Stickman.WIDTH/2 && Gdx.input.getY() > Stickman.HEIGHT/2){
             man.jump();
@@ -265,9 +279,11 @@ public class PracticeState extends State {
             magicRegion = new TextureRegion(magic, magics.get(i)*80+1, 0, 80, 80);
             sb.draw(magicRegion, i * 82 + cam.position.x - (slots.getWidth() / 4) + 1, cam.position.y * 4 / 3 + 1);
         }
+        sb.draw(back, cam.position.x + Stickman.WIDTH/4 - 120, cam.position.y*2 - 40);
         scoreBitmapFont.setColor(0.0f, 0.0f, 0.0f, 1.0f);
         scoreBitmapFont.getData().setScale(2f);
         scoreBitmapFont.draw(sb, scorePoster, cam.position.x - Stickman.WIDTH/4 + 20, cam.position.y*2 - 20);
+
 
 
         sb.end();
@@ -294,6 +310,10 @@ public class PracticeState extends State {
         }
         if(pouvoirNumver == 1){
             man.transparent();
+            return;
+        }
+        if(pouvoirNumver == 2){
+            man.miniature();
             return;
         }
 

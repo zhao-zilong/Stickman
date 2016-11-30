@@ -32,6 +32,7 @@ public class PlayState extends State {
     private static final int TRANSPARENTEFFECT = 5;
     private static final int ACCELERATEEFFECT = 10;
     private static final int TOTALMAGIC = 7;
+    private static final int MINIEFFECT = 10;
 
     private static final int TOTALOBSTACLE = Obstacle.TOTALOBS+OBS_COUNT;
     private int accumelatedObs = 0;
@@ -42,6 +43,7 @@ public class PlayState extends State {
     private Texture background;
     private Texture ground;
     private Texture slots;
+    private Texture back;
     private Texture magic = new Texture("magic/magic.png");
     private TextureRegion magicRegion;
 
@@ -88,6 +90,7 @@ public class PlayState extends State {
         background = new Texture("background.png");
         ground = new Texture("ground.png");
         slots = new Texture("slots.png");
+        back = new Texture("back.png");
 
         pain_hit = Gdx.audio.newSound(Gdx.files.internal("music/pain_hit.ogg"));
 
@@ -124,6 +127,10 @@ public class PlayState extends State {
 //                catch (IOException e){
 //                    Gdx.app.log("socket server: ", "an error occured", e);
 //                }
+            }
+            if (Gdx.input.getX() >= Stickman.WIDTH/2 - 200
+                    && Gdx.input.getY() <= 80){
+                gsm.set(new MenuState(gsm));
             }
         }
         try {
@@ -329,7 +336,7 @@ public class PlayState extends State {
         }
         if(this.combo == OBS_COUNT-1 && emit == true){
             System.out.println("in combo == 5");
-            int magicNumber = rand.nextInt(2);
+            int magicNumber = rand.nextInt(3);
             System.out.println(magicNumber);
             if(magics.size < 7)
                 magics.add(magicNumber);
@@ -364,6 +371,13 @@ public class PlayState extends State {
             }
         }
 
+        if(man.getIsMini()){
+            elapsedTime = (System.nanoTime()-man.getMiniBeginTime())/1000000000.0f;
+            if(elapsedTime > MINIEFFECT){
+                man.terminateMiniature();
+            }
+        }
+
         if((System.nanoTime()-begintime)/1000000000.0f >= 0.15f && isreleased == false
                 && man.getPosition().y == 100 &&Gdx.input.getX() > Stickman.WIDTH/2 && Gdx.input.getY() > Stickman.HEIGHT/2){
             man.jump();
@@ -376,6 +390,7 @@ public class PlayState extends State {
         sb.draw(ground, cam.position.x - (cam.viewportWidth / 2), 84);
         sb.draw(man.getTexture(), man.getPosition().x, man.getPosition().y);
         sb.draw(slots, cam.position.x - slots.getWidth() / 4, cam.position.y*4/3);
+        sb.draw(back, cam.position.x + Stickman.WIDTH/4 - 120, cam.position.y*2 - 40);
         for(Obstacle obs : obstacles){
             sb.draw(obs.getObstacle(), obs.getPosObs().x, obs.getPosObs().y);
 
@@ -412,6 +427,10 @@ public class PlayState extends State {
         }
         if(pouvoirNumver == 1){
             man.transparent();
+            return;
+        }
+        if(pouvoirNumver == 2){
+            man.miniature();
             return;
         }
 

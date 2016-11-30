@@ -22,10 +22,12 @@ public class Man {
 
     private boolean isroll = false;
     private boolean istransparent = false;
+    private boolean isminiature = false;
     private boolean isAcce = false;
     private long rollBeginTime;
     private long tranBeginTime;
     private long acceBeginTime;
+    private long miniBeginTime;
 
     private Animation  manAnimation;
     private Texture texture;
@@ -100,42 +102,105 @@ public class Man {
     public void roll() throws InterruptedException{
         isroll = true;
         rollBeginTime = System.nanoTime();
-        if(istransparent == false) {
+        if(istransparent == false && isminiature == false) {
             texture = new Texture("animation/rollanimation.png");
         }
-        else{
+        else if(istransparent == true && isminiature == false){
             texture = new Texture("animation/rollanimationTransparent.png");
         }
+        else if(istransparent == false && isminiature == true){
+            texture = new Texture("animation/rollanimationMini.png");
+        }
+        else{
+            texture = new Texture("animation/rollanimationTransparentMini.png");
+        }
         manAnimation = new Animation(new TextureRegion(texture), 9, 0.3f);
-        bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
+        if(isminiature)
+            bounds = new Rectangle(position.x, position.y, 20, 35);
+        else
+            bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
 
     }
     public void transparent(){
         istransparent = true;
         tranBeginTime = System.nanoTime();
-        if(isroll){
-            texture = new Texture("animation/rollanimationTransparent.png");
+        if(isminiature == true) {
+            if (isroll) {
+                texture = new Texture("animation/rollanimationTransparentMini.png");
+            } else {
+                texture = new Texture("animation/runanimationTransparentMini.png");
+            }
         }
         else{
-            texture = new Texture("animation/runanimationTransparent.png");
+            if (isroll) {
+                texture = new Texture("animation/rollanimationTransparent.png");
+            } else {
+                texture = new Texture("animation/runanimationTransparent.png");
+            }
         }
         manAnimation = new Animation(new TextureRegion(texture), 9, 0.3f);
-        bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
+        if(isminiature)
+            bounds = new Rectangle(position.x, position.y, 20, 35);
+        else
+            bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
+    }
+
+    public void miniature(){
+        isminiature = true;
+        miniBeginTime = System.nanoTime();
+        if(isroll){
+            texture = new Texture("animation/rollanimationTransparentMini.png");
+        }
+        else{
+            texture = new Texture("animation/runanimationTransparentMini.png");
+        }
+        manAnimation = new Animation(new TextureRegion(texture), 9, 0.3f);
+        bounds = new Rectangle(position.x, position.y, 20, 35);
     }
 
     public void recoveryRoll(){
-        if(istransparent == true){
+        if(istransparent == true && isminiature == false){
             texture = new Texture("animation/runanimationTransparent.png");
         }
-        else {
+        else if(istransparent == false && isminiature == false) {
             texture = new Texture("animation/runanimation.png");
         }
+        else if(istransparent == false && isminiature == true){
+            texture = new Texture("animation/runanimationMini.png");
+        }
+        else{
+            texture = new Texture("animation/runanimationTransparentMini.png");
+        }
         manAnimation = new Animation(new TextureRegion(texture), 9, 0.3f);
-        bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
+        if(isminiature)
+            bounds = new Rectangle(position.x, position.y, 20, 35);
+        else
+            bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
         isroll = false;
     }
     public void terminateTransparent(){
         istransparent = false;
+        if(isminiature == false) {
+            if (isroll == true) {
+                texture = new Texture("animation/rollanimation.png");
+            } else {
+                texture = new Texture("animation/runanimation.png");
+            }
+        }
+        else{
+            if (isroll == true) {
+                texture = new Texture("animation/rollanimationMini.png");
+            } else {
+                texture = new Texture("animation/runanimationMini.png");
+            }
+        }
+        manAnimation = new Animation(new TextureRegion(texture), 9, 0.3f);
+        bounds = new Rectangle(position.x, position.y ,texture.getWidth() / 12, texture.getHeight());
+
+    }
+
+    public void terminateMiniature(){
+        isminiature = false;
         if(isroll == true){
             texture = new Texture("animation/rollanimation.png");
         }
@@ -153,11 +218,13 @@ public class Man {
     }
     public boolean getIsTran() { return istransparent; }
     public boolean getIsAcce() { return isAcce; }
+    public boolean getIsMini() { return isminiature; }
     public long getRollBeginTimeTime(){
         return rollBeginTime;
     }
     public long getTranBeginTime() { return tranBeginTime; }
     public long getAcceBeginTime() { return acceBeginTime; }
+    public long getMiniBeginTime() { return miniBeginTime; }
 
     public Rectangle getBounds(){
         return bounds;
